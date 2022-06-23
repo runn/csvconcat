@@ -9,7 +9,6 @@ class CSVConcatenator:
     def __init__(self, source_path, destination_file):
         self.source_path = source_path
         self.destination_file = destination_file
-        self.csv_generator = self._get_csv_files(source_path)
 
     # wrote a recursive descent here rather than os.walk as I specifically want full paths of csv files
     # makes later code nicer - this should be the only complex thing going on as it's really a recursive generator
@@ -25,9 +24,8 @@ class CSVConcatenator:
             if thing.is_file() and '.csv' in thing.name:
                 yield thing.path
 
-    # public functions consume the file name generator, they shouldn't call each other
     def list_files(self):
-        for x in self.csv_generator:
+        for x in self._get_csv_files(self.source_path):
             print(x)
 
     def concat_files(self):
@@ -36,7 +34,7 @@ class CSVConcatenator:
 
             csv_writer = csv.writer(writer_file)
 
-            for file in self.csv_generator:
+            for file in self._get_csv_files(self.source_path):
                 with open(file, "r") as opened_file:
                     csv_reader = csv.reader(opened_file, dialect=csv.excel)
 
@@ -58,7 +56,7 @@ class CSVConcatenator:
 
 def main():
     if len(sys.argv) < 2:
-        print("CSV Concatenator thing for Amanda\n")
+        print("CSV Concatenator thing\n")
 
         print("Concatenate CSV files split across arbitrarily deeply nested subdirectories. Assumes headers are the "
               "same across files. ")
